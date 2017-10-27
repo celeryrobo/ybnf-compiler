@@ -37,11 +37,11 @@
 (defn grammar-getFailure
   [this]
   (let [fail (insta/get-failure (.get (.state this) "tree"))]
-    (str "index : " (:index fail) "\n"
-         "line : " (:line fail) "\n"
-         "column : " (:column fail) "\n"
-         "text : " (:text fail) "\n"
-         "reason : " (cs/join "; " (map (fn [args] (:expecting args)) (:reason fail))))))
+    (str "index : " (:index fail)
+         "\nline : " (:line fail)
+         "\ncolumn : " (:column fail)
+         "\ntext : " (:text fail)
+         "\nreason : " (cs/join "; " (map (fn [args] (:expecting args)) (:reason fail))))))
 
 (defn grammar-getGrammar
   [this]
@@ -77,11 +77,11 @@
     (if (insta/failure? grammar-tree)
       (let [fail (insta/get-failure grammar-tree)]
         (throw (Exception.
-          (str "index : " (:index fail) "\n"
-               "line : " (:line fail) "\n"
-               "column : " (:column fail) "\n"
-               "text : " (:text fail) "\n"
-               "reason : " (cs/join "; " (map (fn [args] (:expecting args)) (:reason fail)))))))
+          (str "index : " (:index fail)
+               "\nline : " (:line fail)
+               "\ncolumn : " (:column fail)
+               "\ntext : " (:text fail)
+               "\nreason : " (cs/join "; " (map (fn [args] (:expecting args)) (:reason fail)))))))
       (let [[objects slots] (gm/ybnf-parser (gm/ybnf-keyword grammar-tree) grammar-kv)]
         (doto (java.util.HashMap.) (.put "objects" objects) (.put "slots" slots))))))
 
