@@ -10,8 +10,8 @@
               [getGrammar [] String]
               [mergeGrammar [String] void]
               [getHeader [] java.util.Map]
-              [getKeyValue [] clojure.lang.PersistentArrayMap]
-              [mergeKeyValue [clojure.lang.PersistentArrayMap] void]
+              [getKeyValue [] clojure.lang.APersistentMap]
+              [mergeKeyValue [clojure.lang.APersistentMap] void]
               [execCompile [String] java.util.Map]])
   (:import java.util.HashMap
            java.util.ArrayList)
