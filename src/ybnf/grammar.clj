@@ -23,10 +23,11 @@
    variable = <'$'> word
    key = word
    value = word
-   sentence = (( text | variable | choices | ranges | orr | group) {space} )+
+   <sentNotOr> = text | variable | choices | ranges | group
+   sentence = ((sentNotOr | orr) {space} )+
    choices = <'['> {space} sentence {space} <']'>
    ranges = variable <'<'> {space} number [comma number] {space} <'>'>
-   orr = sentence {space} (<'|'> {space} sentence {space})+
+   orr = sentNotOr {space} (<'|'> {space} sentNotOr {space})+
    group = <'('> sentence <')'>
 
    text = #'[0-9A-Za-z\\p{script=Han}]+'
@@ -81,8 +82,7 @@
 (defn ybnf-sentence
   [args]
   (let [[_ & arg] args]
-    (loop [[word & sent] args
-           result ""]
+    (loop [[word & sent] args result ""]
       (if (nil? word) result
         (recur sent (cond
           (keyword? word) result
@@ -92,8 +92,7 @@
 (defn ybnf-keyword
   [args]
   (let [[_ & arg] args]
-    (loop [[it & its] (if (= (.size arg) 1) (first arg) arg)
-           result []]
+    (loop [[it & its] (if (= (.size arg) 1) (first arg) arg) result []]
       (if (nil? it) (into {} result)
         (recur (or its []) (cond
           (keyword? it) (conj result [it (if (= (.size its) 1) (first its) its)])
