@@ -70,7 +70,7 @@
     :text (fn [txt] (str "'" txt "'"))
     :variable (fn [vari] vari)
     :varname (fn [arg & args] (if (empty? args) (str "<" arg ">") arg))
-    :choices (fn [sent] (str "{" sent "}"))
+    :choices (fn [sent] (str "[" sent "]"))
     :group (fn [sent] (str "(" sent ")"))
     :ranges (fn [& args]
       (let [[vari start end] args
