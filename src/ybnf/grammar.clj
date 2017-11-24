@@ -4,18 +4,21 @@
             [clojure.string :as cs]))
 
 (def grammar-lang
-  "root = head [mainArg] body
-   body = define*
+  "root = head [callable] [mainArg] body
+   body = {define}
 
    head = <'#YBNF'> space version space charset semicolon {include} [modeArg]
    version = #'\\d+\\.\\d+'
    charset = 'utf8' | 'UTF8' | 'utf-8' | 'UTF-8'
    include = <'#include'> space filename semicolon
    filename = #'.+\\.ybnf'
-   <modeArg> = <'service'> {space} service semicolon
+   <modeArg> = <'service'> space service semicolon
    service = word
 
-   <mainArg> = <'root'> {space} main semicolon
+   callable = <'callable'> space call {comma call} semicolon
+   call = <'@'> word <'('> {space} {word} {comma word} {space} <')'>
+
+   <mainArg> = <'root'> space main semicolon
    main = variable
 
    define = {space} varname {space} <'='> {space} sentence semicolon
@@ -63,8 +66,17 @@
   "根据自定义YBNF语法树转换成Clojure BNF规则"
   [grammar-tree]
   (insta/transform {
-    :root (fn [& args] (let [[h m b] args] [h (str m "\n" b)]))
+    :root (fn [& args]
+      (condp = (.size args)
+        2 (let [[h b] args] [h nil b])
+        3 (let [[h x b] args] (if (string? x) [h nil (str x "\n" b)] [h x b]))
+        4 (let [[h c m b] args] [h c (str m "\n" b)])))
     :head (fn [& args] args)
+    :callable (fn [& args]
+      (loop [[[_ & params] & calls] args
+             result (java.util.ArrayList.)]
+        (if (nil? params) result
+          (recur calls (doto result (.add (.toArray params)))))))
     :include (fn [args] args)
     :main (fn [marg] (str "root = " marg))
     :text (fn [txt] (str "'" txt "'"))

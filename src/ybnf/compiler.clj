@@ -10,6 +10,8 @@
               [getGrammar [] String]
               [mergeGrammar [String] void]
               [getHeader [] java.util.Map]
+              [getCallable [] java.util.ArrayList]
+              [runCallable [String] String]
               [getKeyValue [] clojure.lang.APersistentMap]
               [mergeKeyValue [clojure.lang.APersistentMap] void]
               [execCompile [String] java.util.Map]])
@@ -22,13 +24,14 @@
 (defn grammar-init
   [^String grammar]
   (let [tree (gm/grammar-compile grammar)
-        [header lang] (if (insta/failure? tree) [nil nil] (gm/grammar-parser tree))
+        [header callable lang] (if (insta/failure? tree) [nil nil nil] (gm/grammar-parser tree))
         keyvalue (if (insta/failure? tree) {} (gm/grammar-keyvalue tree))]
     [[] (doto (java.util.HashMap.)
               (.put "tree" tree)
               (.put "header" header)
               (.put "lang" lang)
-              (.put "keyvalue" keyvalue))]))
+              (.put "keyvalue" keyvalue)
+              (.put "callable" callable))]))
 
 (defn grammar-isFailure
   [this]
@@ -59,6 +62,10 @@
   [this kv]
   (.put (.state this) "keyvalue" (into (.getKeyValue this) kv)))
 
+(defn grammar-getCallable
+  [this]
+  (.get (.state this) "callable"))
+
 (defn grammar-getHeader
   [this]
   (let [header (.get (.state this) "header")
@@ -70,10 +77,14 @@
           (.put heads (name k) (doto (java.util.ArrayList.) (.add v))))
         (if (nil? hs) heads (recur hs))))))
 
+(defn grammar-runCallable
+  [this ^String text]
+  "")
+
 (defn grammar-execCompile
   [this ^String text]
   (let [grammar-kv (.getKeyValue this)
-        grammar-tree (gm/grammar-compile (.getGrammar this) text)]
+        grammar-tree (gm/grammar-compile (str (.getGrammar this) "\n" (.runCallable this text)) text)]
     (if (insta/failure? grammar-tree)
       (let [fail (insta/get-failure grammar-tree)]
         (throw (Exception.
