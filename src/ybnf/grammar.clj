@@ -51,7 +51,7 @@
           [(keyword vn) (if kv (into {} kv) nil)])) args)))))
 
 (def grammar-compile-memoize
-  (memoize (fn [lang] (insta/parser lang))))
+  (memoize (fn [^String lang] (insta/parser lang))))
 
 (def grammar-compile-parser
   (grammar-compile-memoize grammar-lang))
@@ -60,7 +60,7 @@
   ([^String lang]
     (insta/parse grammar-compile-parser lang))
   ([^String grammar ^String lang]
-    (insta/parse (grammar-compile-memoize grammar) lang)))
+    (insta/parse (insta/parser grammar) lang)))
 
 (defn grammar-parser
   "根据自定义YBNF语法树转换成Clojure BNF规则"
