@@ -26,12 +26,13 @@
    variable = <'$'> word
    key = word
    value = word
-   <sentNotOr> = text | variable | choices | ranges | group
+   <sentNotOr> = text | variable | choices | ranges | group | zeroMore
    sentence = ((sentNotOr | orr) {space} )+
    choices = <'['> {space} sentence {space} <']'>
    ranges = variable <'<'> {space} number [comma number] {space} <'>'>
    orr = sentNotOr {space} (<'|'> {space} sentNotOr {space})+
    group = <'('> sentence <')'>
+   zeroMore = <'{'> sentence <'}'>
 
    text = #'[0-9A-Za-z\\p{script=Han}]+'
    <number> = #'\\d+'
@@ -84,6 +85,7 @@
     :varname (fn [arg & args] (if (empty? args) (str "<" arg ">") arg))
     :choices (fn [sent] (str "[" sent "]"))
     :group (fn [sent] (str "(" sent ")"))
+    :zeroMore (fn [sent] (str "{" sent "}"))
     :ranges (fn [& args]
       (let [[vari start end] args
             s (Integer/parseInt start)
