@@ -8,12 +8,12 @@
   "#YBNF 0.1 utf8;
    #include sss.ybnf;
    service common;
-   callable @cutword(title), @cutword(poetry);
+   callable @cutword( title , hh ), @cutword(poetry);
    root $main;
    $main = $poetry_main;
 
    $data{title} = 静夜诗|赠汪伦|登黄鹤楼;
-   $poetry_main{service%poetry} = {$ch} 我想听 $data {$ch};
+   $poetry_main{service%poetry} = {$ch} ( 我想听 ) $data $ch<1,4>;
 ")
 
 (def ttt "真的我想听赠汪伦是真的")
@@ -22,9 +22,9 @@
   [& args]
   (let [cp (ybnf.compiler. lang-test)]
 ;    (pp/pprint (.getFailure cp))
+    (pp/pprint (.get (.state cp) "tree"))
     (def grammar (str (.getGrammar cp) "\n<ch> = #'[0-9A-Za-z\\p{script=Han}]'"))
     (println grammar)
-;    (pp/pprint (.get (.state cp) "tree"))
 ;    (pp/pprint (.getKeyValue cp))
 ;    (pp/pprint (.execCompile cp ttt))
     (def tree (insta/parse (insta/parser grammar) ttt))

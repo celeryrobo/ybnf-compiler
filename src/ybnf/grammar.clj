@@ -16,23 +16,23 @@
    service = word
 
    callable = <'callable'> space call {comma call} semicolon
-   call = <'@'> word <'('> {space} {word} {comma word} {space} <')'>
+   call = <'@'> word <'('> {space} {word {comma word}} {space} <')'>
 
    <mainArg> = <'root'> space main semicolon
    main = variable
 
    define = {space} varname {space} <'='> {space} sentence semicolon
-   varname = variable [<'{'> key [<'%'> value] <'}'>]
+   varname = variable [<'{'> {space} key [ {space} <'%'> {space} value] {space} <'}'>]
    variable = <'$'> word
    key = word
    value = word
    <sentNotOr> = text | variable | choices | ranges | group | zeroMore
-   sentence = ((sentNotOr | orr) {space} )+
+   sentence = ((sentNotOr | orr) {space})+
    choices = <'['> {space} sentence {space} <']'>
    ranges = variable <'<'> {space} number [comma number] {space} <'>'>
    orr = sentNotOr {space} (<'|'> {space} sentNotOr {space})+
-   group = <'('> sentence <')'>
-   zeroMore = <'{'> sentence <'}'>
+   group = <'('> {space} sentence <')'>
+   zeroMore = <'{'> {space} sentence <'}'>
 
    text = #'[0-9A-Za-z\\p{script=Han}]+'
    <number> = #'\\d+'
@@ -90,8 +90,8 @@
       (let [[vari start end] args
             s (Integer/parseInt start)
             e (if end (Integer/parseInt end) 0)]
-        (str (cs/join "" (map (fn [x] (str "(" vari ")")) (range s)))
-          (cs/join "" (map (fn [x] (str "[" vari "]")) (range s e))))))
+        (str (cs/join " " (map (fn [x] vari) (range s))) " "
+          (cs/join " " (map (fn [x] (str "[" vari "]")) (range s e))))))
     :orr (fn [& args] (cs/join "|" args))
     :sentence (fn [& args] (cs/join " " args))
     :define (fn [& args] (let [[vn vv] args] (str vn " = " vv)))
